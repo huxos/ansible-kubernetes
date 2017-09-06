@@ -1,0 +1,15 @@
+cluster_cidr: 10.20.0.0/16
+cluster_dns: 10.101.66.2
+cluster_kubernetes: 10.101.66.1
+cluster_domain: cluster.local
+max_pods: 32
+node_cidr_mask_size: 27
+service_cidr: 10.101.66.0/23
+bootstrap: 4abe3070e3e0b9a155654ce143e5c86a
+hyperkube_image: gcr.io/google_containers/hyperkube:v1.7.3
+etcd_image: quay.io/coreos/etcd:v3.2.3
+kubectl_download_url: https://storage.googleapis.com/kubernetes-release/release/v1.7.3/bin/linux/amd64/kubectl
+kubelet_download_url: https://storage.googleapis.com/kubernetes-release/release/v1.7.3/bin/linux/amd64/kubelet
+kubectl_checksum: md5:685c426a22fd1d82a5db45e1723ababd
+kubelet_checksum: md5:50414afce99e677f68e1fd3476577190
+pod_infra_container_image: gcr.io/google_containers/pause-amd64:3.0

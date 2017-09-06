@@ -1,0 +1,25 @@
+[Unit]
+After=docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=/bin/mkdir -p /etc/kubernetes/manifests
+ExecStart=/opt/bin/kubelet \
+  --require-kubeconfig=true \
+  --serialize-image-pulls=false \
+  --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml \
+  --network-plugin=cni \
+  --allow-privileged=true \
+  --container-runtime=docker \
+  --docker=unix:///var/run/docker.sock \
+  --pod-manifest-path=/etc/kubernetes/manifests \
+  --hostname-override={{inventory_hostname}} \
+  --cluster-dns={{cluster_dns}} \
+  --cluster-domain={{cluster_domain}} \
+  --max-pods={{max_pods}} \
+  --pod-infra-container-image={{pod_infra_container_image}}
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

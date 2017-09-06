@@ -1,0 +1,7 @@
+---
+- name: apply cni config node
+  hosts: '{{s}}'
+  remote_user: root
+
+  roles:
+    - cni

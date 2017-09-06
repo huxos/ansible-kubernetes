@@ -1,0 +1,6 @@
+---
+- name: install docker packages
+  apt: name={{item}} state=installed update_cache=yes
+  with_items:
+      - docker.io
+  notify: enable and restart docker

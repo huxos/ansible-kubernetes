@@ -1,0 +1,36 @@
+set nobackup
+set nocompatible
+set number
+set showtabline=2
+set paste
+set backspace=indent,eol,start
+set nobackup
+set history=50
+set ruler
+set showcmd
+set incsearch
+set enc=utf-8
+set modelines=1
+
+" Python
+syntax on
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set textwidth=79
+set smarttab
+set expandtab
+
+" vimdiff
+set diffopt=context:3
+set diffopt+=iwhite
+
+"colorscheme delek
+colorscheme desert
+
+map <F2> :w <CR>
+map <F7> :bp <CR>
+map <F9> :bn <CR>
+map <F10> :!clear;bash % <CR> 
+map <F11> :!clear;python % <CR>
+map <F12> :!clear;pep8 %;sleep 1 <CR>

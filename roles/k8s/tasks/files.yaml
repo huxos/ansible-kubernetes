@@ -1,0 +1,30 @@
+---
+- name: ssl directory
+  file: name=/etc/kubernetes/ssl state=directory
+
+- name: copy kubelet systemd unit
+  template: src=lib/systemd/system/kubelet.service dest=/lib/systemd/system/kubelet.service
+  notify: enable and restart kubelet
+
+- name: copy kubelet bootstrap conf
+  copy: src=etc/kubernetes/bootstrap-kubeconfig.yaml dest=/etc/kubernetes/bootstrap-kubeconfig.yaml
+  notify: enable and restart kubelet
+
+- name: copy kube-proxy conf
+  copy: src=etc/kubernetes/proxy-kubeconfig.yaml dest=/etc/kubernetes/proxy-kubeconfig.yaml
+  notify: enable and restart kubelet
+
+#- name: copy kube-proxy pod
+#  template: src=etc/kubernetes/manifests/kube-proxy.yaml dest=/etc/kubernetes/manifests/kube-proxy.yaml
+#  notify: enable and restart kubelet
+
+- name: opt-bin dir
+  file: name=/opt/bin state=directory
+
+- name: kubelet binary file
+  get_url: url={{kubelet_download_url}} dest=/opt/bin/kubelet mode=755 checksum={{kubelet_checksum}}
+  notify: enable and restart kubelet
+
+- name: docker args
+  copy: src=etc/default/docker dest=/etc/default/docker
+  notify: enable and restart docker

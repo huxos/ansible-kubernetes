@@ -1,0 +1,14 @@
+{
+    "CN": "flannel",
+    "hosts": [
+    ],
+    "key": {
+        "algo": "rsa",
+        "size": 2048
+    },
+    "names": [
+        {
+            "O": "ETCD"
+        }
+    ]
+}

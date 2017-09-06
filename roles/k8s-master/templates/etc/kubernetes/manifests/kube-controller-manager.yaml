@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kube-controller-manager
+  namespace: kube-system
+  labels:
+    k8s-app: kube-controller-manager
+spec:
+  hostNetwork: true
+  containers:
+  - name: kube-controller-manager
+    image: {{hyperkube_image}}
+    command:
+    - /hyperkube
+    - controller-manager
+    - --master=http://127.0.0.1:8080
+    - --leader-elect=true
+    - --cluster-name=kubernetes
+    - --cluster-signing-cert-file=/etc/kubernetes/ssl/ca.pem
+    - --cluster-signing-key-file=/etc/kubernetes/ssl/ca-key.pem
+    - --service-account-private-key-file=/etc/kubernetes/ssl/ca-key.pem
+    - --root-ca-file=/etc/kubernetes/ssl/ca.pem
+    - --allocate-node-cidrs=true
+    - --cluster-cidr={{cluster_cidr}}
+    - --node-cidr-mask-size={{node_cidr_mask_size}}
+    livenessProbe:
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 10252
+      initialDelaySeconds: 15
+      timeoutSeconds: 1
+    volumeMounts:
+    - mountPath: /etc/kubernetes/ssl
+      name: ssl-certs-kubernetes
+      readOnly: true
+    - mountPath: /etc/ssl/certs
+      name: ssl-certs-host
+      readOnly: true
+    - mountPath: /dev/
+      name: dev
+    - mountPath: /etc/ceph/
+      name: cephconfig
+  volumes:
+  - hostPath:
+      path: /etc/kubernetes/ssl
+    name: ssl-certs-kubernetes
+  - hostPath:
+      path: /usr/share/ca-certificates
+    name: ssl-certs-host
+  - hostPath:
+      path: /etc/ceph
+    name: cephconfig
+  - hostPath:
+      path: /dev/
+    name: dev

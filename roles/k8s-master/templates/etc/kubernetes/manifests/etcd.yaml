@@ -1,0 +1,54 @@
+{%- set etcd_peers = [] -%}
+{%- for item in groups['k8s_master'] -%}
+{%- set _ = etcd_peers.append(['infra', loop.index - 1, '=', 'https://', item, ':2380'] | join('')) -%}
+{%- endfor -%}
+{%- set etcd_peers_url = etcd_peers | join(',') -%}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: etcd
+  namespace: kube-system
+  labels:
+    k8s-app: etcd
+spec:
+  hostNetwork: true
+  containers:
+  - name: etcd
+    image: {{etcd_image}}
+    command:
+    - etcd
+    - --name=infra{{ groups.k8s_master.index(inventory_hostname) }}
+    - --data-dir=/var/etcd/data
+    - --cert-file=/etc/etcd/ssl/server.pem
+    - --key-file=/etc/etcd/ssl/server-key.pem
+    - --trusted-ca-file=/etc/etcd/ssl/ca.pem
+    - --peer-cert-file=/etc/etcd/ssl/member.pem
+    - --peer-key-file=/etc/etcd/ssl/member-key.pem
+    - --peer-trusted-ca-file=/etc/etcd/ssl/ca.pem
+    - --client-cert-auth
+    - --peer-client-cert-auth
+    - --initial-advertise-peer-urls=https://{{inventory_hostname}}:2380
+    - --listen-peer-urls=https://{{inventory_hostname}}:2380
+    - --listen-client-urls=https://{{inventory_hostname}}:2379,https://127.0.0.1:2379
+    - --advertise-client-urls=https://{{inventory_hostname}}:2379
+    - --initial-cluster-token=6522f860-7ffb-495c-83ee-a0a4ebc39f90
+    - --initial-cluster={{etcd_peers_url}}
+    - --initial-cluster-state=new
+    volumeMounts:
+    - mountPath: /etc/ssl/certs
+      name: ssl-certs-host
+      readOnly: true
+    - mountPath: /var/etcd/data
+      name: etcd-data
+    - mountPath: /etc/etcd/ssl
+      name: ssl-certs-etcd
+  volumes:
+  - hostPath:
+      path: /usr/share/ca-certificates
+    name: ssl-certs-host
+  - hostPath:
+      path: /var/etcd/data
+    name: etcd-data
+  - hostPath:
+      path: /etc/etcd/ssl
+    name: ssl-certs-etcd

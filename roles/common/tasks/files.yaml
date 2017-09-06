@@ -1,0 +1,40 @@
+---
+- name: copy system config files
+  copy: src="{{item}}" dest={{"/" + item}}
+  with_items:
+    - etc/timezone
+    - etc/dir_colors
+    - etc/bash.bashrc
+    - etc/vim/vimrc
+    - etc/security/limits.conf
+    - etc/shutdown.allow
+    - etc/tmux.conf
+
+- name: timezone symlink
+  file: src=/usr/share/zoneinfo/Asia/Shanghai dest=/etc/localtime state=link force=yes
+
+- name: kernel sysctl.conf
+  template: src=etc/sysctl.conf dest=/etc/sysctl.conf
+  notify: sysctl apply
+
+- name: rsyslog config
+  copy: src=etc/rsyslog.conf dest=/etc/rsyslog.conf
+  notify: restart rsyslog
+
+- name: ntp config
+  copy: src=etc/ntp.conf dest=/etc/ntp.conf
+  notify:
+  - restart ntp
+  - disable systemd-timesyncd
+  - enable network time
+
+- name: gen hostname
+  set_fact:
+    hostname: "{{('l-',(inventory_hostname).split('.')[0].zfill(3),(inventory_hostname).split('.')[1].zfill(3),(inventory_hostname).split('.')[2].zfill(3),(inventory_hostname).split('.')[3].zfill(3),'-ubuntu')|join('')}}"
+- name: hostname config
+  template: src=etc/hostname dest=/etc/hostname
+
+- name: add hosts
+  lineinfile: dest=/etc/hosts regexp='.*{{ hostname }}$' line="{{ inventory_hostname }} {{hostname}}" state=present
+  when: hostname is defined
+  notify: apply hostname

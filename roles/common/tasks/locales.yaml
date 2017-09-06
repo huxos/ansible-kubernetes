@@ -1,0 +1,9 @@
+---
+- name: locale_gen config file
+  file: src=etc/locale.gen dest=/etc/locale.gen
+  register: local_conf
+- name: gen locale
+  raw: locale-gen
+  when: local_conf|changed
+- name: config locale
+  file: src=etc/default/locale dest=/etc/default/locale

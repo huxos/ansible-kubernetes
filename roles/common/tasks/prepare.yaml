@@ -1,0 +1,12 @@
+---
+- name: resolv config
+  template: src=etc/resolv.conf dest=/etc/resolv.conf
+
+#- name: apt config
+#  template: src=etc/apt/apt.conf dest=/etc/apt/apt.conf
+
+- name: apt repo config
+  copy: src=etc/apt/sources.list dest=/etc/apt/sources.list
+
+- name: apt InstallRecommends  config
+  copy: src=etc/apt/apt.conf.d/00InstallRecommends dest=/etc/apt/apt.conf.d/00InstallRecommends

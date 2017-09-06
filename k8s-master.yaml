@@ -1,0 +1,7 @@
+---
+- name: apply configuration on k8s-master node
+  hosts: '{{s}}'
+  remote_user: root
+
+  roles:
+    - k8s-master

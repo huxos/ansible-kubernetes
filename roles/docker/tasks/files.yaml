@@ -1,0 +1,8 @@
+---
+- name: docker args
+  copy: src=etc/default/docker dest=/etc/default/docker
+  notify: enable and restart docker
+
+- name: docker config
+  copy: src=etc/docker/daemon.json dest=/etc/docker/daemon.json
+  notify: enable and restart docker

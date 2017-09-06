@@ -1,0 +1,67 @@
+install_packages:
+    - sudo
+    - gawk
+    - tree
+    - unzip
+    - curl
+    - rsync
+    - lsof
+    - strace
+    - psmisc
+    - tcpdump
+    - ipmitool
+    - ethtool
+    - ntpdate
+    - p7zip-full
+    - ifstat
+    - vim
+    - iotop
+    - linux-tools-virtual
+    - ncdu
+    - man-db
+    - mtr-tiny
+    - netcat-openbsd
+    - locales
+    - iputils-ping
+    - dnsutils
+    - nmon
+    - sysstat
+    - htop
+    - tmux
+    - ntp
+
+remove_packages:
+    - acpid
+    - syslog-ng
+    - isc-dhcp-client
+    - irqbalance
+    - mlocate
+    - rpcbind
+    - postfix
+    - resolvconf
+    - lxd
+    - lxc-common
+    - lxcfs
+
+disabled_services:
+    - acpid
+    - atd
+    - autolog
+    - bootlogs
+    - rmnologin
+    - stop-bootlogd
+    - impievd
+    - irqbalance
+    - ip6tables
+    - iptables
+    - mdmonitor
+    - cpuspeed
+    - kdump
+    - abrtd
+    - abrt-ccpp
+
+nameservers:
+    - 10.33.75.243
+
+ntp_server:
+    - 10.31.67.31

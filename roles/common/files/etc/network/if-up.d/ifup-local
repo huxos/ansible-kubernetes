@@ -1,0 +1,18 @@
+#!/bin/bash -e
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+ETHTOOL=/sbin/ethtool
+
+[[ "$1" == eth* ]] || exit 0
+test -x $ETHTOOL || exit 0
+
+#interface rx buffer tuning
+ethtool -G $1 rx `ethtool -g $1 | sed -n '1,/RX:/s/RX:\s\+\([0-9]\+\)/\1/p'` &>/dev/null
+
+#interface rx-usecs config
+ethtool -C $1 rx-usecs 50 &>/dev/null
+
+# irp  rps rfs config
+python  /usr/share/ansible/scripts/nic_tuning.py &>/dev/null
+
+exit 0

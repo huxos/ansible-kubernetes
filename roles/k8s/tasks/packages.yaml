@@ -1,0 +1,8 @@
+---
+- name: install docker packages
+  apt: name={{item}} state=installed update_cache=yes
+  with_items:
+      - docker.io
+      - ceph-common
+      - ceph-fs-common
+  notify: enable and restart docker

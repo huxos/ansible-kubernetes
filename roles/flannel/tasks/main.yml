@@ -1,0 +1,22 @@
+---
+- name: ssl directory
+  file: name=/etc/flannel/ssl state=directory
+
+- name: copy etcd client cert file
+  copy: src="{{item}}" dest={{"/" + item}} mode=600
+  with_items:
+    - etc/flannel/ssl/ca.pem
+    - etc/flannel/ssl/flannel-key.pem
+    - etc/flannel/ssl/flannel.pem
+
+- name: opt-bin dir
+  file: name=/opt/bin state=directory
+
+
+- name: flanneld systemd units
+  template: src=flanneld.service dest=/lib/systemd/system/flanneld.service
+  notify: enable and restart flanneld
+
+- name: flanneld binary file
+  copy: src=flanneld-amd64 dest=/opt/bin/flanneld mode=755
+  notify: enable and restart flanneld

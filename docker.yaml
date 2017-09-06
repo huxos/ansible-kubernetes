@@ -1,0 +1,7 @@
+---
+- name: apply docker configuration
+  hosts: '{{s}}'
+  remote_user: root
+
+  roles:
+    - docker

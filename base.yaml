@@ -1,0 +1,7 @@
+---
+- name: apply tuning configuration on ubuntu 16.04
+  hosts: '{{s}}'
+  remote_user: root
+
+  roles:
+    - common

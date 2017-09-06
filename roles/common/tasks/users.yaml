@@ -1,0 +1,5 @@
+---
+- name: add ssh authorized_keys
+  authorized_key: user=root key="{{item}}" state=present
+  with_file:
+    - publickey/root

@@ -1,0 +1,12 @@
+---
+- name: cni bianry dir
+  file: path=/opt/cni/bin state=directory
+
+- name: cni bianrys
+  unarchive: src=cni.tar.gz dest=/opt/cni/bin/
+
+- name: cni config dir
+  file: path=/etc/cni/net.d/ state=directory
+
+- name: cni config file
+  template: src=etc/cni/net.d/10-containers.conf dest=/etc/cni/net.d/10-containers.conf

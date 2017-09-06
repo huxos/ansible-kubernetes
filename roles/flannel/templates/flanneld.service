@@ -1,0 +1,18 @@
+{%- set etcd_peers = [] -%}
+{%- for item in groups['k8s_master'] -%}
+{%- set _ = etcd_peers.append(['https://', item, ':2379'] | join('')) -%}
+{%- endfor -%}
+{%- set etcd_url = etcd_peers | join(',') -%}
+[Service]
+ExecStart=/opt/bin/flanneld \
+   -iface {{flannel_iface}}\
+   -etcd-cafile=/etc/flannel/ssl/ca.pem \
+   -etcd-certfile=/etc/flannel/ssl/flannel.pem \
+   -etcd-keyfile=/etc/flannel/ssl/flannel-key.pem \
+   -etcd-endpoints={{etcd_url}}
+   -etcd-prefix="/coreos.com/network" \
+   -ip-masq
+Restart=always
+RestartSec=10
+[Install]
+WantedBy=multi-user.target

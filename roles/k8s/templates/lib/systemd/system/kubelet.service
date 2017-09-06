@@ -1,0 +1,23 @@
+[Service]
+ExecStartPre=/bin/mkdir -p /etc/kubernetes/manifests
+ExecStart=/opt/bin/kubelet \
+  --require-kubeconfig \
+  --experimental-bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubeconfig.yaml \
+  --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml \
+  --cert-dir=/etc/kubernetes/ssl \
+  --container-runtime=docker \
+  --docker=unix:///var/run/docker.sock \
+  --network-plugin=cni \
+  --allow-privileged=true \
+  --pod-manifest-path=/etc/kubernetes/manifests \
+  --hostname-override={{inventory_hostname}} \
+  --cluster-dns={{cluster_dns}} \
+  --cluster-domain={{cluster_domain}} \
+  --max-pods={{max_pods}} \
+  --serialize-image-pulls=false \
+  --pod-infra-container-image={{pod_infra_container_image}}
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

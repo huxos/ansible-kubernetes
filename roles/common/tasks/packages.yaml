@@ -1,0 +1,7 @@
+---
+- name: install base packages
+  apt: name={{item}} state=installed update_cache=yes
+  with_items: "{{install_packages}}"
+- name: remove some packages
+  apt: name={{item}} state=absent
+  with_items: "{{remove_packages}}"

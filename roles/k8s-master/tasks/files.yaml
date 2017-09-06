@@ -1,0 +1,74 @@
+---
+- name: ssl directory
+  file: name=/etc/kubernetes/ssl state=directory
+
+- name: copy kubelet cert file
+  copy: src="{{item}}" dest={{"/" + item}} mode=600
+  with_items:
+    - etc/kubernetes/ssl/apiserver-key.pem
+    - etc/kubernetes/ssl/apiserver.pem
+    - etc/kubernetes/ssl/ca.pem
+    - etc/kubernetes/ssl/ca-key.pem
+
+- name: etcd ssl directory
+  file: name=/etc/etcd/ssl state=directory
+
+- name: copy etcd client cert file
+  copy: src="{{item}}" dest={{"/" + item}} mode=600
+  with_items:
+    - etc/etcd/ssl/ca.pem
+    - etc/etcd/ssl/client-key.pem
+    - etc/etcd/ssl/client.pem
+    - etc/etcd/ssl/server-key.pem
+    - etc/etcd/ssl/server.pem
+
+- name: etcd peer key
+  copy: src=etc/etcd/ssl/server{{ groups.k8s_master.index(inventory_hostname) }}-key.pem dest=/etc/etcd/ssl/member-key.pem mode=600
+
+- name: etcd peer cert
+  copy: src=etc/etcd/ssl/server{{ groups.k8s_master.index(inventory_hostname) }}.pem dest=/etc/etcd/ssl/member.pem mode=600
+
+- name: copy kubelet systemd unit
+  template: src=lib/systemd/system/kubelet.service dest=/lib/systemd/system/kubelet.service
+  notify: enable and restart kubelet
+
+- name: manifests  directory
+  file: name=/etc/kubernetes/manifests state=directory
+
+- name: kubeconfig file
+  copy: src=etc/kubernetes/worker-kubeconfig.yaml dest=/etc/kubernetes/worker-kubeconfig.yaml
+
+- name: kubeconfig token
+  copy: src=etc/kubernetes/token.csv dest=/etc/kubernetes/token.csv
+
+- name: copy master static pods
+  template: src="{{item}}" dest={{"/" + item}}
+  with_items:
+    - etc/kubernetes/manifests/etcd.yaml
+    - etc/kubernetes/manifests/kube-apiserver.yaml
+    - etc/kubernetes/manifests/kube-controller-manager.yaml
+    - etc/kubernetes/manifests/kube-scheduler.yaml
+    #- etc/kubernetes/manifests/kube-proxy.yaml
+  notify: enable and restart kubelet
+
+- name: opt-bin dir
+  file: name=/opt/bin state=directory
+
+- name: stop kubelet
+  command:  systemctl stop kubelet
+  when: replace_kubelet == 'true'
+
+- name: kubelet binary file
+  get_url: url={{kubelet_download_url}} dest=/opt/bin/kubelet mode=755 checksum={{kubelet_checksum}}
+  notify: enable and restart kubelet
+
+- name: start kubelet
+  command:  systemctl start kubelet
+  when: replace_kubelet == 'true'
+
+- name: kubectl binary file
+  get_url: url={{kubectl_download_url}} dest=/usr/bin/kubectl mode=755 checksum={{kubectl_checksum}}
+
+- name: docker args
+  copy: src=etc/default/docker dest=/etc/default/docker
+  notify: enable and restart docker

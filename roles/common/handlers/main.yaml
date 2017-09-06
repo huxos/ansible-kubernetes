@@ -1,0 +1,29 @@
+---
+- name: execute nic_tuning script
+  shell: /etc/network/if-up.d/ifup-local {{ item }}
+  with_items: "{{ansible_interfaces}}"
+  ignore_errors: yes
+
+- name: sysctl apply
+  command: sysctl -e -p
+
+- name: restart rsyslog
+  service: name=rsyslog state=restarted enabled=yes
+
+- name: restart ntp
+  service: name=ntp state=restarted enabled=yes
+
+- name: reload ssh
+  service: name=sshd state=reloaded enabled=yes
+
+- name: apply hostname
+  command: hostname {{ hostname }}
+
+- name: disable systemd-timesyncd
+  systemd:
+    name: systemd-timesyncd
+    state: stopped
+    enabled: no
+
+- name: enable network time
+  command: timedatectl set-ntp on

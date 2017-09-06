@@ -1,0 +1,8 @@
+---
+#- include: prepare.yaml
+#- include: packages.yaml
+#- include: locales.yaml
+#- include: services.yaml
+#- include: users.yaml
+- include: files.yaml
+#- include: nic_tuning.yaml
